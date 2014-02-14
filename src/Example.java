@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Random;
 
 /**
  * Created by Anatoly.Cherkasov on 06.02.14.
@@ -268,22 +269,33 @@ public class Example {
                 kv.addRowList(storageRowList);
                 long fTime = new Date().getTime();
                 System.out.println("File. Test 1. Load. Done in " + ((fTime-sTime)/1000%60) + " sec");
+                //
+                // Теперь сделаем случайную выборку строк
+                // Сгенерим 10 случайных ключей и для каждого из них достанем данные
+                String key;
+                ArrayList<StorageRow> newRowList;
+                sTime = new Date().getTime();
 
+                for (int i = 0 ; i<300;i++){
+                    // Сгенерим ключ
+                    key = "/che/cms_attr_value/" + (2000000 + (int)(Math.random()*2500000)) + "/12";
+                    // Достанем сроки
+                    newRowList = kv.getRowList(key,true);
+                    if (!newRowList.isEmpty()){
+                        System.out.println("find " + key);
+                    }
+                    // Получим информацию из строк
+                    for (StorageRow x : newRowList){
+                        System.out.println(" [" + x.getKey() + "] " + (CmsAttrValueRow) Serializer.unserialize(x.getValue()));
+                    }
+                }
+                fTime = new Date().getTime();
+                System.out.println("File. Test 1. Search. Done in " + ((fTime-sTime)/1000%60) + " sec");
                 System.out.println("Collection. Test 1 - Done.");
             }
 
         }
 
-/*
-        // Выборочно достаем из хранилища.
-        ArrayList<StorageRow> storageRowListPart = kv.getRowList("/cms_attr_value/30904056", false);
-        Iterator<StorageRow> rowIteratorPart = storageRowListPart.iterator();
-        StorageRow storageRow;
-        while (rowIteratorPart.hasNext()){
-            storageRow = rowIteratorPart.next();
-            System.out.println("[" + storageRow.getKey() + "] : " + ((CmsAttrValueRow)Serializer.unserialize((storageRow.getValue()))) );
-        }
-*/
         //Закроем соединение с хранилищем
         kv.close();
 
