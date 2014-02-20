@@ -1,0 +1,148 @@
+CREATE OR REPLACE AND COMPILE  JAVA SOURCE NAMED "che_test"
+   AS 
+    import  java.sql.*;
+    import  java.lang.*;
+    import  java.math.*;
+    import java.io.*;
+    import oracle.sql.*;
+    import oracle.jdbc.driver.*;    
+    import oracle.sql.ARRAY;
+    
+    public class AttrValue {
+    
+        private BigDecimal entity_id;
+        private BigDecimal etyp_id;
+        private BigDecimal adat_id;
+        private String value;
+        
+        public AttrValue(BigDecimal entity_id, BigDecimal etyp_id, BigDecimal adat_id, String value) {
+            this.entity_id = entity_id;
+            this.etyp_id = etyp_id;
+            this.adat_id = adat_id;
+            this.value = value;
+        }
+        
+        public BigDecimal get_entity_id () {
+            return this.entity_id;
+        }
+        
+        public BigDecimal get_etyp_id () {
+            return this.etyp_id;
+        }
+        
+        public BigDecimal get_adat_id () {
+            return this.adat_id;
+        }
+        
+        public String get_value () {
+            return this.value;
+        }                        
+    
+    }
+    
+    public class che_test extends Object
+    {
+        public static int test( ) throws SQLException {
+        
+        #sql {
+           begin dbms_output.put_line('Print OK.'); end;
+           };
+           
+           System.out.println ("Первый пошел");  
+           
+           return -1;
+        }
+
+      public static String return_string()
+       {
+          return "Hello World";
+       }
+
+       public static Timestamp return_date()
+       {
+          return new Timestamp(0);
+       }
+
+       public static BigDecimal return_num()
+       {
+          return new BigDecimal("44.3543");
+       }
+
+       public static void pass_number (BigDecimal p_in, BigDecimal[] p_out)
+       {
+           if (p_in != null)
+           {
+               System.out.println ("Первый параметр " + p_in);
+     
+               p_out[0] = p_in.negate();
+     
+               System.out.println ("Устанавливаем параметр out равным " + p_out[0]);
+           }
+       }
+   
+       public static void pass_date (Timestamp p_in, Timestamp[] p_out)
+       {
+           if (p_in != null)
+           {
+               System.out.println ("Первый параметр " + p_in);
+     
+               p_out[0] = p_in;
+     
+               if (p_out[0].getMonth() < 11)
+                   p_out[0].setMonth(p_out[0].getMonth()+1);
+               else
+               {
+                   p_out[0].setMonth(0);
+                   p_out[0].setYear(p_out[0].getYear()+1);
+               }
+               System.out.println ("Устанавливаем параметр out равным " + p_out[0]);
+           }
+       }
+
+        public static void pass_string(String p_in, String[] p_out)
+           {
+               if (p_in != null)
+               {
+                   System.out.println
+                   ("Первый параметр " + p_in);
+         
+                   p_out[0] = p_in.toUpperCase();
+         
+                   System.out.println
+                   ("Устанавливаем параметр out равным " + p_out[0]);
+               }
+           }
+
+
+        public static void pass_num_array (ARRAY p_in, ARRAY[] p_out ) throws SQLException {
+            
+            int[] result = {1,2,3,4,5,6,7,8,9};    
+        
+            int[] nums = p_in.getIntArray();
+        
+           System.out.println("Тип массива      " + p_in.getSQLTypeName());  
+         
+            for (int x : nums) {
+               System.out.println (x);
+            }
+
+            Connection conn = new OracleDriver().defaultConnection();
+            ArrayDescriptor descriptor = ArrayDescriptor.createDescriptor("NUMBER_TABLE", conn);
+
+            p_out[0] = new ARRAY(descriptor, conn, result);
+                   
+       }
+       
+        public static void pass_struct (STRUCT p_in) throws SQLException {
+        
+            Object[] attrs = p_in.getAttributes();
+            
+            AttrValue av = new AttrValue((BigDecimal)attrs[0], (BigDecimal)attrs[1], (BigDecimal)attrs[2], (String)attrs[3]);
+            
+            System.out.println("entity_id " + av.get_entity_id());
+            System.out.println("etyp_id " + av.get_etyp_id());
+            System.out.println("adat_id " + av.get_adat_id());
+            System.out.println("value " + av.get_value());
+      }
+}
+/
